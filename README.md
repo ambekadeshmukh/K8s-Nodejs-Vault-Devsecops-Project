@@ -1,6 +1,6 @@
 # Secure Node.js Deployment with DevSecOps Pipeline
 
-This project demonstrates a complete DevSecOps implementation for deploying a secure Node.js web application using modern cloud-native technologies. The project incorporates security at every stage of the deployment pipeline.
+This project demonstrates a complete DevSecOps implementation for deploying a secure Node.js web application using modern cloud-native technologies. It incorporates security at every stage of the deployment pipeline.
 
 ## Architecture Overview
 
@@ -19,7 +19,7 @@ This project implements:
 
 ## Prerequisites
 
-Before starting this project, ensure you have:
+Before starting the project, ensure you have:
 
 1. **AWS Account** with appropriate permissions to create EKS clusters
 2. **Local development environment** with the following tools installed:
