@@ -1,12 +1,11 @@
 # Secure Node.js Deployment with DevSecOps Pipeline
 
-**Note:** This repository uses the `main` branch as the default branch.
-
 This project demonstrates a complete DevSecOps implementation for deploying a secure Node.js web application using modern cloud-native technologies. It incorporates security at every stage of the deployment pipeline.
 
 ## Architecture Overview
 
-![DevSecOps Architecture](./architecture-diagram.png)
+![devsecopsk8s](https://github.com/user-attachments/assets/567e32eb-0475-4f8d-990d-109829b336c8)
+
 
 This project implements:
 
