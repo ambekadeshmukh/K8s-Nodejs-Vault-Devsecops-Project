@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: nodejs-app-network-policy
+  namespace: default
+spec:
+  podSelector:
+    matchLabels:
+      app: devsecops-nodejs-app
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Allow inbound traffic on port 3000 from any source
+  - ports:
+    - port: 3000
+      protocol: TCP
+  egress:
+  # Allow outbound traffic for DNS resolution
+  - ports:
+    - port: 53
+      protocol: UDP
+    - port: 53
+      protocol: TCP
+  # Allow outbound traffic for external API calls if needed
+  - ports:
+    - port: 443
+      protocol: TCP

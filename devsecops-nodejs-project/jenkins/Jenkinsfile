@@ -1,0 +1,131 @@
+pipeline {
+    agent any
+    
+    environment {
+        DOCKER_HUB_CREDS = credentials('dockerhub-credentials')
+        DOCKER_IMAGE = "${DOCKER_HUB_CREDS_USR}/devsecops-nodejs-app"
+        DOCKER_TAG = "${env.BUILD_NUMBER}"
+    }
+    
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // Clean workspace before cloning
+                cleanWs()
+                
+                // Clone repository
+                echo 'Cloning repository...'
+                git branch: 'main', url: 'https://github.com/your-username/devsecops-nodejs-project.git'
+            }
+        }
+        
+        stage('Static Code Analysis') {
+            steps {
+                echo 'Running static code analysis...'
+                dir('app') {
+                    // Install dependencies for linting
+                    sh 'npm install'
+                    
+                    // Run ESLint
+                    sh 'npm run lint || true'
+                }
+            }
+        }
+        
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                dir('app') {
+                    // Build the Docker image
+                    sh "docker build -t ${DOCKER_IMAGE}:${DOCKER_TAG} ."
+                    
+                    // Tag as latest
+                    sh "docker tag ${DOCKER_IMAGE}:${DOCKER_TAG} ${DOCKER_IMAGE}:latest"
+                }
+            }
+        }
+        
+        stage('Vulnerability Scan') {
+            steps {
+                echo 'Scanning Docker image for vulnerabilities...'
+                
+                // Use Trivy to scan the Docker image
+                sh "trivy image --exit-code 0 --severity HIGH,CRITICAL ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                
+                // Generate HTML report
+                sh "trivy image --format template --template '@/tmp/trivy-html.tpl' --output trivy-report.html ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                
+                // Archive vulnerability report
+                archiveArtifacts artifacts: 'trivy-report.html', fingerprint: true
+            }
+        }
+        
+        stage('Push to DockerHub') {
+            steps {
+                echo 'Pushing Docker image to DockerHub...'
+                
+                // Login to DockerHub
+                sh "echo ${DOCKER_HUB_CREDS_PSW} | docker login -u ${DOCKER_HUB_CREDS_USR} --password-stdin"
+                
+                // Push both tags
+                sh "docker push ${DOCKER_IMAGE}:${DOCKER_TAG}"
+                sh "docker push ${DOCKER_IMAGE}:latest"
+            }
+        }
+        
+        stage('Deploy to Kubernetes') {
+            steps {
+                echo 'Deploying to Kubernetes...'
+                
+                // Update the deployment image in Kubernetes manifest
+                sh "sed -i 's|image: .*|image: ${DOCKER_IMAGE}:${DOCKER_TAG}|' kubernetes/deployment.yaml"
+                
+                // Apply Kubernetes manifests
+                sh "kubectl apply -f kubernetes/deployment.yaml"
+                sh "kubectl apply -f kubernetes/service.yaml"
+                
+                // Wait for deployment to complete
+                sh "kubectl rollout status deployment/devsecops-nodejs-app"
+            }
+        }
+        
+        stage('Integration Testing') {
+            steps {
+                echo 'Running integration tests...'
+                
+                // Wait for service to be available
+                sh '''
+                    EXTERNAL_IP=""
+                    while [ -z $EXTERNAL_IP ]; do
+                        echo "Waiting for external IP..."
+                        EXTERNAL_IP=$(kubectl get service devsecops-nodejs-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+                        [ -z "$EXTERNAL_IP" ] && sleep 10
+                    done
+                    echo "Service is available at $EXTERNAL_IP"
+                    
+                    # Basic health check
+                    curl -s http://$EXTERNAL_IP/api/health
+                '''
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Clean up Docker images
+            sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
+            sh "docker rmi ${DOCKER_IMAGE}:latest || true"
+            
+            // Logout from DockerHub
+            sh "docker logout"
+        }
+        
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        
+        failure {
+            echo 'Pipeline failed. Please check the logs.'
+        }
+    }
+}

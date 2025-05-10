@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devsecops-nodejs-app
+  labels:
+    app: devsecops-nodejs-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: devsecops-nodejs-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: devsecops-nodejs-app
+    spec:
+      # Security Context for Pod
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: devsecops-nodejs-container
+        image: your-dockerhub-username/devsecops-nodejs-app:latest
+        imagePullPolicy: Always
+        # Security Context for Container
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          capabilities:
+            drop:
+              - ALL
+        ports:
+        - containerPort: 3000
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "200m"
+            memory: "256Mi"
+        # Liveness probe to check if the app is responsive
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+        # Readiness probe to check if the app is ready to serve traffic
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 2
+        env:
+        - name: SECRET_MESSAGE
+          valueFrom:
+            secretKeyRef:
+              name: app-secret
+              key: secret-message
+        # Temporary storage for application logs
+        volumeMounts:
+        - name: tmp-volume
+          mountPath: /tmp
+      # Volume for temporary storage
+      volumes:
+      - name: tmp-volume
+        emptyDir: {}
