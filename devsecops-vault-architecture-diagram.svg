@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 800 500">
+  <defs>
+    <style>
+      .component { fill:#e6f2ff; stroke:#0066cc; stroke-width:2; }
+      .aws { fill:#ffebcc; stroke:#ff9900; stroke-width:2; }
+      .security { fill:#ffe6e6; stroke:#cc0000; stroke-width:2; }
+      .flow { fill:none; stroke:#666666; stroke-width:2; marker-end:url(#arrowhead); }
+      .label { font-family:Arial, sans-serif; font-size:12px; fill:#333333; }
+      .title { font-family:Arial, sans-serif; font-size:14px; font-weight:bold; fill:#000000; }
+      .cloud { fill:#f2f2f2; stroke:#999999; stroke-width:2; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666666"/>
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" class="title" style="font-size:18px">DevSecOps Pipeline for Node.js Application Deployment</text>
+  
+  <!-- Developer Environment -->
+  <rect x="50" y="80" width="100" height="60" rx="5" ry="5" class="component"/>
+  <text x="100" y="115" text-anchor="middle" class="title">Developer</text>
+  <text x="100" y="130" text-anchor="middle" class="label">Git Repo</text>
+  
+  <!-- CI/CD Pipeline -->
+  <rect x="230" y="80" width="120" height="60" rx="5" ry="5" class="component"/>
+  <text x="290" y="115" text-anchor="middle" class="title">Jenkins</text>
+  <text x="290" y="130" text-anchor="middle" class="label">CI/CD Pipeline</text>
+  
+  <!-- Security Scanning -->
+  <rect x="230" y="180" width="120" height="60" rx="5" ry="5" class="security"/>
+  <text x="290" y="210" text-anchor="middle" class="title">Trivy</text>
+  <text x="290" y="225" text-anchor="middle" class="label">Security Scanning</text>
+  
+  <!-- Containerization -->
+  <rect x="420" y="80" width="120" height="60" rx="5" ry="5" class="component"/>
+  <text x="480" y="115" text-anchor="middle" class="title">Docker</text>
+  <text x="480" y="130" text-anchor="middle" class="label">Containerization</text>
+  
+  <!-- Container Registry -->
+  <rect x="420" y="180" width="120" height="60" rx="5" ry="5" class="component"/>
+  <text x="480" y="210" text-anchor="middle" class="title">DockerHub</text>
+  <text x="480" y="225" text-anchor="middle" class="label">Container Registry</text>
+  
+  <!-- Secrets Management -->
+  <rect x="420" y="280" width="120" height="60" rx="5" ry="5" class="security"/>
+  <text x="480" y="310" text-anchor="middle" class="title">HashiCorp Vault</text>
+  <text x="480" y="325" text-anchor="middle" class="label">Secrets Management</text>
+  
+  <!-- AWS Cloud -->
+  <ellipse cx="650" cy="230" rx="120" ry="180" class="cloud"/>
+  <text x="650" y="110" text-anchor="middle" class="title">AWS Cloud</text>
+  
+  <!-- Kubernetes -->
+  <rect x="590" y="150" width="120" height="60" rx="5" ry="5" class="aws"/>
+  <text x="650" y="180" text-anchor="middle" class="title">EKS Cluster</text>
+  <text x="650" y="195" text-anchor="middle" class="label">Kubernetes</text>
+  
+  <!-- Application Pods -->
+  <rect x="590" y="250" width="120" height="60" rx="5" ry="5" class="aws"/>
+  <text x="650" y="280" text-anchor="middle" class="title">Application Pods</text>
+  <text x="650" y="295" text-anchor="middle" class="label">Node.js App</text>
+  
+  <!-- Security Policies -->
+  <rect x="590" y="350" width="120" height="60" rx="5" ry="5" class="security"/>
+  <text x="650" y="380" text-anchor="middle" class="title">Security Policies</text>
+  <text x="650" y="395" text-anchor="middle" class="label">RBAC, PSP, NetPol</text>
+  
+  <!-- IaC -->
+  <rect x="230" y="320" width="120" height="60" rx="5" ry="5" class="component"/>
+  <text x="290" y="350" text-anchor="middle" class="title">Terraform</text>
+  <text x="290" y="365" text-anchor="middle" class="label">Infrastructure as Code</text>
+  
+  <!-- Arrows -->
+  <!-- Development to Jenkins -->
+  <path d="M 150 110 L 230 110" class="flow"/>
+  
+  <!-- Jenkins to Docker -->
+  <path d="M 350 110 L 420 110" class="flow"/>
+  
+  <!-- Jenkins to Security Scanning -->
+  <path d="M 290 140 L 290 180" class="flow"/>
+  
+  <!-- Docker to Container Registry -->
+  <path d="M 480 140 L 480 180" class="flow"/>
+  
+  <!-- Container Registry to Kubernetes -->
+  <path d="M 540 210 L 590 180" class="flow"/>
+  
+  <!-- Kubernetes to Application Pods -->
+  <path d="M 650 210 L 650 250" class="flow"/>
+  
+  <!-- Vault to Application Pods -->
+  <path d="M 540 310 L 590 280" class="flow"/>
+  
+  <!-- Security Policies to Application Pods -->
+  <path d="M 650 350 L 650 310" class="flow"/>
+  
+  <!-- Terraform to AWS/EKS -->
+  <path d="M 350 350 L 590 180" class="flow"/>
+  
+  <!-- Legend -->
+  <rect x="50" y="410" width="20" height="15" class="component"/>
+  <text x="75" y="423" class="label">Components</text>
+  
+  <rect x="150" y="410" width="20" height="15" class="aws"/>
+  <text x="175" y="423" class="label">AWS Resources</text>
+  
+  <rect x="270" y="410" width="20" height="15" class="security"/>
+  <text x="295" y="423" class="label">Security Controls</text>
+  
+  <line x1="390" y1="418" x2="430" y2="418" class="flow"/>
+  <text x="455" y="423" class="label">Workflow</text>
+</svg>
